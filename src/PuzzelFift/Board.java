@@ -13,6 +13,7 @@ public class Board {
   private final JTextPane attemptsTextPane;
   private int attempts = 0;
 
+  //Skapar upp bricks och boardpanelen här och shufflar bricksen direkt.
   public Board() {
     createBricks();
     attemptsTextPane = new JTextPane();
@@ -31,6 +32,7 @@ public class Board {
     return this.attemptsTextPane;
   }
 
+  //Swappar plats på bricks och uppdaterar attempts countern, sedan uppdaterar boardpanelen och attempts texten.
   public void swapBrick(Brick brick) {
     if (isSwappableBrick(brick)) {
       attempts++;
@@ -40,6 +42,7 @@ public class Board {
     }
   }
 
+  //Shufflar bricksen i en random ordning.
   public void shuffleBricks() {
     Random random = new Random();
     for (Brick brick : brickSlots) {
@@ -48,7 +51,7 @@ public class Board {
       swapBricks(brick, randomBrick);
     }
 
-    // Shuffle until bricks are not in correct order
+    //Shufflar bricksen tills dom inte är i korrekt ordning.
     if (isInCorrectOrder()) {
       shuffleBricks();
       return;
@@ -59,6 +62,7 @@ public class Board {
     updateBoardPanel();
   }
 
+  //Skapar upp 15st numbered bricks och sätter sedan 1 tom brick sist i vår lista.
   private void createBricks() {
     for (int i = 0; i < 15; i++) {
       int number = i + 1;
@@ -67,6 +71,7 @@ public class Board {
     brickSlots.add(emptyBrick);
   }
 
+  //Kollar om bricks är i rätt ordning
   private boolean isInCorrectOrder() {
     for (int i = 0; i < brickSlots.size() - 1; i++) {
       if (brickSlots.get(i) instanceof NumberedBrick numberedBrick) {
@@ -80,14 +85,18 @@ public class Board {
     return true;
   }
 
+  //Kollar så att vi inte går utanför range av array och får indexError
   private boolean isInRange(int index) {
     return index >= 0 && index < brickSlots.size();
   }
 
+  //Kollar om DEN brick vi klickar på finns med i listan i swappableBricks. (actionListener i numberedBrick class).
   private boolean isSwappableBrick(Brick brick) {
     return getAllSwappableBricks().contains(brick);
   }
 
+  // Skapar upp en lista som håller reda på vilka bricks som är swappable
+  //Utgår från emptyBrick's index
   private List<Brick> getAllSwappableBricks() {
     List<Brick> swappableBricks = new ArrayList<>();
 
@@ -97,25 +106,25 @@ public class Board {
     int leftIndex = emptyBrickIndex - 1; // Slot above is 1 position before
     int rightIndex = emptyBrickIndex + 1; // Slot above is 1 position after
 
-    // Get brick above empty brick, and also make sure we don't go out of range for array
+    //Hämta brick ovanför empty brick, och kolla så att vi inte går utanför range av array
     if (isInRange(aboveIndex)) {
       Brick brickAbove = brickSlots.get(aboveIndex);
       swappableBricks.add(brickAbove);
     }
 
-    // Get brick below empty brick, and also make sure we don't go out of range for array
+    //Hämta brick under empty brick, och kolla så att vi inte går utanför range av array
     if (isInRange(belowIndex)) {
       Brick brickBelow = brickSlots.get(belowIndex);
       swappableBricks.add(brickBelow);
     }
 
-    // Get brick to left of empty brick, and also make sure we don't go out of range for array and that emptyBrick is not already in the leftmost column
+    //Hämta brick till vänster om empty brick, och kolla så vi inte går går utanför range av array, och även se att empty brick inte redan är i column längst till vänster
     if (isInRange(leftIndex) && emptyBrickIndex % 4 != 0) {
       Brick brickBefore = brickSlots.get(leftIndex);
       swappableBricks.add(brickBefore);
     }
 
-    // Get brick to right of empty brick, and also make sure we don't go out of range for array and that the brick after is not in the leftmost column
+    //Hämta brick till vänster om empty brick, och kolla så vi inte går går utanför range av array, och även se att nästa brick inte redan är i column längst till vänster
     if (isInRange(rightIndex) && rightIndex % 4 != 0) {
       Brick brickAfter = brickSlots.get(rightIndex);
       swappableBricks.add(brickAfter);
@@ -124,6 +133,7 @@ public class Board {
     return swappableBricks;
   }
 
+  //Swappar plats på bricks i listan
   private void swapBricks(Brick a, Brick b) {
     int indexA = brickSlots.indexOf(a);
     int indexB = brickSlots.indexOf(b);
@@ -131,6 +141,8 @@ public class Board {
     brickSlots.set(indexB, a);
   }
 
+
+  //Uppdaterar boardPanel, raderar allt och uppdaterar boarden med uppdaterade listan, och kollar om man har vunnit spelet.
   private void updateBoardPanel() {
     boardPanel.removeAll();
     for (Brick brick : brickSlots) {
@@ -145,6 +157,7 @@ public class Board {
     }
   }
 
+  //Uppdaterar textPane, som visar antal knapptryck.
   private void updateAttemptsTextPane() {
     attemptsTextPane.setText("Antal knapptryck: " + attempts);
     attemptsTextPane.revalidate();
